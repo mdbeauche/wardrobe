@@ -11,7 +11,7 @@ import {
 } from "./counterSlice";
 import styles from "./Counter.module.css";
 
-export function Counter() {
+export default function Counter() {
   const count = useTypedSelector(selectCount);
   const dispatch = useTypedDispatch();
   const [incrementAmount, setIncrementAmount] = useState("2");
