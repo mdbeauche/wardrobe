@@ -1,16 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Link, Redirect } from "react-router-dom";
-// import PropTypes from 'prop-types';
-import Style from "./scss/ErrorPage.module.scss";
+import React, { useState, useEffect } from 'react';
+import { Link, Redirect } from 'react-router-dom';
+import Style from './scss/ErrorPage.module.scss';
 
 const Error = ({ error, location }) => {
   const [countdown, setCountdown] = useState(10);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCountdown((prevCount) => {
-        return prevCount - 1;
-      });
+      setCountdown((prevCount) => prevCount - 1);
     }, 1000);
 
     return () => {
@@ -26,7 +23,7 @@ const Error = ({ error, location }) => {
     return (
       <Redirect
         to={{
-          pathname: "/",
+          pathname: '/',
         }}
       />
     );
@@ -45,7 +42,7 @@ const Error = ({ error, location }) => {
           type="button"
           className={[Style.Button, Style.ButtonRed, Style.ButtonWide]
             .filter((c) => c)
-            .join(" ")}
+            .join(' ')}
         >
           Return to Home
         </button>
@@ -55,8 +52,3 @@ const Error = ({ error, location }) => {
 };
 
 export default Error;
-
-// Error.propTypes = {
-//   error: PropTypes.string.isRequired,
-//   location: PropTypes.object.isRequired,
-// };

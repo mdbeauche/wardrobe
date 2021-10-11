@@ -1,15 +1,15 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter } from "react-router-dom";
-import "./index.css";
-import App from "./App/App";
-import { store } from "./store/store";
-import { Provider } from "react-redux";
-import * as serviceWorker from "./serviceWorker";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
+import './index.css';
+import { Provider } from 'react-redux';
+import App from './App/App';
+import { store } from './store/store';
+import * as serviceWorker from './serviceWorker';
 
 // runs axe-core accessibility test and reports results in developer console
-if (process.env.NODE_ENV === "development") {
-  import("@axe-core/react").then((axe) => {
+if (process.env.NODE_ENV === 'development') {
+  import('@axe-core/react').then((axe) => {
     axe.default(React, ReactDOM, 1000, {});
   });
 }
@@ -22,7 +22,7 @@ ReactDOM.render(
       </BrowserRouter>
     </Provider>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change

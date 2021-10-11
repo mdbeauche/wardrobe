@@ -1,22 +1,12 @@
-import React from "react";
-import { Route, Switch, Redirect } from "react-router-dom";
+import React from 'react';
+import { Route, Switch, Redirect } from 'react-router-dom';
 // import { useDispatch, useSelector } from "react-redux";
-// import PropTypes from "prop-types";
-import ContentWrapper from "../components/ContentWrapper/ContentWrapper";
-import Loader from "../components/Loader/Loader";
+import ContentWrapper from '../components/ContentWrapper/ContentWrapper';
+import Loader from '../components/Loader/Loader';
 // import { fetchGlobal } from "../../store/slices/globalSlice";
-import routes from "./routes";
+import routes from './routes';
 // import { clearUser, setUser } from "../../store/slices/userSlice";
-import "./App.css";
-
-const ExternalRedirect = ({ to }: { to: any }) => {
-  window.location.replace(to);
-  return null;
-};
-
-// ExternalRedirect.propTypes = {
-//   to: PropTypes.string.isRequired,
-// };
+import './App.css';
 
 const App = () => {
   // const dispatch = useDispatch();
@@ -40,7 +30,7 @@ const App = () => {
             const { isAuth = false } = route.params || {};
 
             // need to reset scroll position in between page change
-            if (typeof window !== "undefined") {
+            if (typeof window !== 'undefined') {
               window.scrollTo(0, 0);
             }
 
@@ -56,23 +46,15 @@ const App = () => {
               return <Loader />;
             }
 
+            // unauthenticated
             return (
               <Redirect
                 to={{
-                  pathname: "/",
+                  pathname: '/',
                   state: { authenticated: false },
                 }}
               />
             );
-
-            // unauthenticated
-            // return (
-            //   <ExternalRedirect
-            //     to={encodeURI(
-            //       `${process.env.REACT_APP_REDIRECT_URI || '/'}`,
-            //     )}
-            //   />
-            // );
           }}
         />
       ))}

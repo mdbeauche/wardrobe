@@ -1,13 +1,11 @@
-import Counter from "../components/Counter/Counter";
+import Counter from '../components/Counter/Counter';
 
-const Sandbox = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <Counter />
-      </header>
-    </div>
-  );
-};
+const Sandbox = () => (
+  <div className="App">
+    <header className="App-header">
+      <Counter />
+    </header>
+  </div>
+);
 
 export default Sandbox;

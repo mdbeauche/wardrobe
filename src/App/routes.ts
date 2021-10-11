@@ -1,6 +1,6 @@
 // import { lazy } from "react";
 // import { Redirect } from "react-router-dom";
-import Sandbox from "../views/Sandbox";
+import Sandbox from '../views/Sandbox';
 // import HomePage from '../Home/HomePage';
 // import Loader from '../Loader/Loader';
 
@@ -18,9 +18,9 @@ const routes = [
   //   },
   // },
   {
-    path: "/",
+    path: '/',
     exact: true,
-    name: "Sandbox",
+    name: 'Sandbox',
     component: Sandbox,
     params: {
       isAuth: false,

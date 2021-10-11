@@ -1,5 +1,9 @@
-// import PropTypes from 'prop-types';
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+} from 'react';
 
 const getWidth = () =>
   window.innerWidth ||
@@ -32,10 +36,10 @@ export const ViewportContext = ({ children }) => {
       }, 250);
     };
 
-    window.addEventListener("resize", handleWindowResize);
+    window.addEventListener('resize', handleWindowResize);
 
     return () => {
-      window.removeEventListener("resize", handleWindowResize);
+      window.removeEventListener('resize', handleWindowResize);
     };
   }, []);
 
@@ -45,10 +49,6 @@ export const ViewportContext = ({ children }) => {
     </viewportContext.Provider>
   );
 };
-
-// ViewportContext.propTypes = {
-//   children: PropTypes.node.isRequired,
-// };
 
 export const useViewport = () => {
   const { width, height } = useContext(viewportContext);
