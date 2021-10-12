@@ -59,11 +59,11 @@ jobs:
           # path to lint config files
           LINTER_RULES_PATH: /
           # eslint config file location
-          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc.js
+          JAVASCRIPT_ES_CONFIG_FILE: .eslintrc-github.js
           # use prettier JS style
           JAVASCRIPT_DEFAULT_STYLE: prettier
           # eslint config file location again
-          TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.js
+          TYPESCRIPT_ES_CONFIG_FILE: .eslintrc-github.js
           # lint only src folder
           FILTER_REGEX_INCLUDE: .*src/.*
           # only lint new or modified files

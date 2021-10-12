@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import {
-  useTypedSelector,
-  useTypedDispatch,
-} from '../../hooks/typedRedux';
+import { useTypedSelector, useTypedDispatch } from '../../hooks/typedRedux';
 import {
   decrement,
   increment,

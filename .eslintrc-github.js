@@ -58,6 +58,8 @@ module.exports = {
     'react/forbid-prop-types': 0,
     'react/require-default-props': 0,
     'no-unused-expressions': 'error',
-    'import/no-unresolved': [2, { caseSensitive: false }],
+    // below 2 are because node_modules is not committed, so super-linter can't check
+    'import/no-unresolved': 0,
+    'import/no-cycle': 0,
   },
 };

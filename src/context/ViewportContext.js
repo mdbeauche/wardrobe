@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-} from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 const getWidth = () =>
   window.innerWidth ||
