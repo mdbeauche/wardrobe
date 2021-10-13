@@ -1,0 +1,36 @@
+.DatabasePanel {
+  width: 100%;
+  height: 100%;
+
+  table {
+    width: 80%;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+
+  tr {
+    background-color: transparent;
+  }
+
+  tr:nth-child(even) {
+    background-color: #4C8BF5;
+    color: #fff;
+  }
+
+  thead tr {
+      background-color: #6d6e70;
+      color: #fff;
+  }
+
+  td:last-child {
+    border: 0px solid black;
+    background-color: transparent;
+  }
+}
+
+.SelectedRow {
+  background-color: #1348a3 !important;
+  color: #fff !important;
+}

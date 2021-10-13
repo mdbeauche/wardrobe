@@ -1,4 +1,4 @@
-import DatabasePanel from '../components/Database/DatabasePanel';
+import Counter from '../components/Counter/Counter';
 
 const Sandbox = () => (
   <>
@@ -7,7 +7,11 @@ const Sandbox = () => (
     </a>
     {/* <Header /> */}
     <main id="main-content" role="main">
-      <DatabasePanel name="users" />
+      <div className="App">
+        <header className="App-header">
+          <Counter />
+        </header>
+      </div>
     </main>
     {/* <Footer /> */}
   </>

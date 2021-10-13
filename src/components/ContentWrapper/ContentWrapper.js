@@ -1,7 +1,5 @@
 import React from 'react';
 import { ViewportContext } from '../../context/ViewportContext';
-// import Header from '../Header/Header';
-// import Footer from '../Footer/Footer';
 import Error from '../Error/Error';
 
 class ErrorBoundary extends React.Component {
@@ -32,16 +30,7 @@ class ErrorBoundary extends React.Component {
 }
 
 const ContentWrapperInner = ({ children }) => (
-  <>
-    <a href="#main-content" className="sr-only sr-only-focusable">
-      Skip to main content
-    </a>
-    {/* <Header /> */}
-    <main id="main-content" role="main">
-      <ErrorBoundary>{children}</ErrorBoundary>
-    </main>
-    {/* <Footer /> */}
-  </>
+  <ErrorBoundary>{children}</ErrorBoundary>
 );
 
 const ContentWrapper = ({ children }) => (
