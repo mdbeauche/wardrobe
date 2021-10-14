@@ -7,7 +7,7 @@ const Sandbox = () => (
     </a>
     {/* <Header /> */}
     <main id="main-content" role="main">
-      <DatabasePanel name="users" />
+      <DatabasePanel />
     </main>
     {/* <Footer /> */}
   </>
