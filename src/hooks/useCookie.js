@@ -28,9 +28,7 @@ const getStoredCookie = (key) =>
     const storedKey = item[0];
     const storedValue = item[1];
 
-    return key === storedKey
-      ? decodeURIComponent(storedValue)
-      : total;
+    return key === storedKey ? decodeURIComponent(storedValue) : total;
   }, '');
 
 const setStoredCookie = (key, value, numberOfDays) => {

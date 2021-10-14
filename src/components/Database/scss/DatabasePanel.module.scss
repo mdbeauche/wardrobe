@@ -3,25 +3,23 @@
   height: 100%;
 
   table {
-    width: 80%;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
   }
 
   th, td {
-    padding: 10px;
+    padding: 10px 10px;
   }
 
-  tr {
-    background-color: transparent;
+  thead > tr {
+    background-color: #6d6e70;
+    color: white;
   }
 
   tr:nth-child(even) {
     background-color: #4C8BF5;
-    color: #fff;
-  }
-
-  thead tr {
-      background-color: #6d6e70;
-      color: #fff;
+    color: white;
   }
 
   td:last-child {
@@ -31,6 +29,14 @@
 }
 
 .SelectedRow {
-  background-color: #1348a3 !important;
-  color: #fff !important;
+  box-shadow: 0 0 0 0.2em orange;
+}
+
+.UnlockedRow {
+  box-shadow: 0 0 0 0.2em red;
+}
+
+.SelectedCell {
+  color: black;
+  background-color: yellow;
 }
