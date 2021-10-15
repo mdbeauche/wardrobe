@@ -47,7 +47,7 @@ const DatabasePanel = () => {
         <>
           <h1>Tables:</h1>
           <ul>
-            {tables.map((tableName) => (
+            {tables.map(({ table: tableName, count }) => (
               <li key={tableName}>
                 <button
                   type="button"
@@ -61,7 +61,7 @@ const DatabasePanel = () => {
                   />
                 </button>
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                {tableName}
+                {`${tableName} [${count}]`}
               </li>
             ))}
           </ul>

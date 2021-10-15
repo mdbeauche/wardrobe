@@ -9,6 +9,10 @@
     padding-left: 0;
   }
 
+  li {
+    font-weight: bold;
+  }
+
   ul > li:nth-child(even) {
     background-color: #4C8BF5;
     color: white;

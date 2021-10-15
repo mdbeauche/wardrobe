@@ -32,9 +32,8 @@ export default function TablePanel({ name }: { name: string }) {
   const [cellUpdate, setCellUpdate] = useState<TObject>({});
   const [rowUpdate, setRowUpdate] = useState<TObject>({});
   const [createNewRow, setCreateNewRow] = useState(false);
-
-  console.log('records[0]:', records[0]);
-  console.log('schema:', schema);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const onKeyPressHandler = (fn: Function) => (event: { key: string }) => {
     if (event.key === 'Enter') {
@@ -95,9 +94,10 @@ export default function TablePanel({ name }: { name: string }) {
       .then((response: Response) => {
         if (response.success) {
           getRecords();
+          setSuccess(`Success: ${response.message}`);
         } else {
-          // TODO
-          console.log(`delete record failure: ${JSON.stringify(response)}`);
+          console.log(`Failed to delete record ${id}: ${response.message}`);
+          setError(`Failed to delete record ${id}: ${response.message}`);
         }
       });
   };
@@ -127,9 +127,10 @@ export default function TablePanel({ name }: { name: string }) {
         .then((response: Response) => {
           if (response.success) {
             getRecords();
+            setSuccess(`Success: updated record  ${id}`);
           } else {
-            // TODO
-            console.log(`update record failure: ${JSON.stringify(response)}`);
+            console.log(`Failed to update record ${id}: ${response.message}`);
+            setError(`Failed to update record ${id}: ${response.message}`);
           }
         });
     },
@@ -150,9 +151,11 @@ export default function TablePanel({ name }: { name: string }) {
       .then((response: Response) => {
         if (response.success) {
           getRecords();
+          setCreateNewRow(false);
+          setSuccess(`Success: ${response.message}`);
         } else {
-          // TODO
-          console.log(`update record failure: ${JSON.stringify(response)}`);
+          console.log(`Failed to create record: ${response.message}`);
+          setError(`Failed to create record: ${response.message}`);
         }
       });
   }, [rowUpdate]);
@@ -173,8 +176,8 @@ export default function TablePanel({ name }: { name: string }) {
 
   return (
     <div className={Style.TablePanel}>
-      {records.length > 0 && (
-        <div>
+      {Object.keys(schema).length > 0 && (
+        <>
           <h1>
             Table: {name} [{records.length}]
           </h1>
@@ -189,18 +192,52 @@ export default function TablePanel({ name }: { name: string }) {
                     <Icon path={mdiPlus} title="Create Record" size="0.8em" />
                   </button>
                 </th>
-                {Object.keys(records[0]).map((key) => (
+                <th>id</th>
+                <th>created_at</th>
+                <th>updated_at</th>
+                {Object.keys(schema).map((key) => (
                   <th key={`${key}`} title={`${schema[key]}`}>
                     {`${key}`}
                   </th>
                 ))}
                 <th>&nbsp;</th>
               </tr>
+              {success !== '' && (
+                <tr className={Style.Success}>
+                  <td colSpan={Object.keys(schema).length + 4}>{success}</td>
+                  <td>
+                    <button
+                      onClick={() => setSuccess('')}
+                      onKeyPress={onKeyPressHandler(() => setSuccess(''))}
+                      type="button"
+                    >
+                      <Icon path={mdiClose} title="Close Result" size="2em" />
+                    </button>
+                  </td>
+                </tr>
+              )}
+              {error !== '' && (
+                <tr className={Style.Error}>
+                  <td colSpan={Object.keys(schema).length + 4}>{error}</td>
+                  <td>
+                    <button
+                      onClick={() => setError('')}
+                      onKeyPress={onKeyPressHandler(() => setError(''))}
+                      type="button"
+                    >
+                      <Icon path={mdiClose} title="Close Error" size="2em" />
+                    </button>
+                  </td>
+                </tr>
+              )}
               {createNewRow && (
                 <tr className={Style.NewRow}>
                   <td>&nbsp;</td>
-                  {records.length > 0 &&
-                    Object.entries(records[0]).map(([key]) => (
+                  <td>id</td>
+                  <td>created_at</td>
+                  <td>updated_at</td>
+                  {Object.keys(schema).length > 0 &&
+                    Object.keys(schema).map((key) => (
                       <td key={key}>
                         <div
                           className={
@@ -215,103 +252,100 @@ export default function TablePanel({ name }: { name: string }) {
                           role="textbox"
                           tabIndex={0}
                         >
-                          {schema[key]?.includes('int') ||
-                          schema[key]?.includes('char') ? (
+                          {selectedCell === `new:${key}` ? (
                             <>
-                              {selectedCell === `new:${key}` ? (
+                              {schema[key]?.includes('int') && (
+                                <input
+                                  type="number"
+                                  defaultValue={
+                                    rowUpdate[key] !== undefined
+                                      ? rowUpdate[key]
+                                      : ''
+                                  }
+                                  min={0}
+                                  max={
+                                    schema[key]?.includes('(')
+                                      ? Number(
+                                          schema[key].match(/\((\d+)\)/)![1]
+                                        )
+                                      : undefined
+                                  }
+                                  onChange={(event) =>
+                                    setCellUpdate({
+                                      [key]: event.target.value,
+                                    })
+                                  }
+                                />
+                              )}
+                              {schema[key]?.includes('char') ||
+                              schema[key]?.includes('text') ? (
                                 <>
-                                  {schema[key]?.includes('int') ? (
-                                    <input
-                                      type="number"
-                                      defaultValue={
-                                        rowUpdate[key] !== undefined
-                                          ? rowUpdate[key]
-                                          : ''
-                                      }
-                                      min={0}
-                                      max={
-                                        schema[key]?.includes('(')
-                                          ? Number(
-                                              schema[key].match(/\((\d+)\)/)![1]
-                                            )
-                                          : undefined
-                                      }
-                                      onChange={(event) =>
-                                        setCellUpdate({
-                                          [key]: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  ) : (
-                                    <textarea
-                                      autoComplete="on"
-                                      // eslint-disable-next-line jsx-a11y/no-autofocus
-                                      autoFocus
-                                      maxLength={
-                                        schema[key]?.includes('(')
-                                          ? Number(
-                                              schema[key].match(/\((\d+)\)/)![1]
-                                            )
-                                          : undefined
-                                      }
-                                      defaultValue={
-                                        rowUpdate[key] !== undefined
-                                          ? rowUpdate[key]
-                                          : ''
-                                      }
-                                      onBlur={(event) => {
-                                        // onBlur called when textarea loses focus -> save updates
-                                        setCellUpdate({
-                                          [key]: event.target.value,
-                                        });
-                                      }}
-                                    />
-                                  )}
-                                  <button
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      setSelectedCell('');
-                                      setCellUpdate({});
+                                  <textarea
+                                    autoComplete="on"
+                                    // eslint-disable-next-line jsx-a11y/no-autofocus
+                                    autoFocus
+                                    maxLength={
+                                      schema[key]?.includes('(')
+                                        ? Number(
+                                            schema[key].match(/\((\d+)\)/)![1]
+                                          )
+                                        : undefined
+                                    }
+                                    defaultValue={
+                                      rowUpdate[key] !== undefined
+                                        ? rowUpdate[key]
+                                        : ''
+                                    }
+                                    onBlur={(event) => {
+                                      // onBlur called when textarea loses focus -> save updates
+                                      setCellUpdate({
+                                        [key]: event.target.value,
+                                      });
                                     }}
-                                    onKeyPress={onKeyPressHandler(
-                                      (event: Event) => {
-                                        event.stopPropagation();
-                                        setSelectedCell('');
-                                        setCellUpdate({});
-                                      }
-                                    )}
-                                    type="button"
-                                  >
-                                    <Icon
-                                      path={mdiClose}
-                                      title="Cancel Edit"
-                                      size="1em"
-                                    />
-                                  </button>
-                                  <button
-                                    onClick={saveEditCallback}
-                                    onKeyPress={onKeyPressHandler(
-                                      saveEditCallback
-                                    )}
-                                    type="button"
-                                  >
-                                    <Icon
-                                      path={mdiCheck}
-                                      title="Save Edit"
-                                      size="1em"
-                                    />
-                                  </button>
+                                  />
                                 </>
                               ) : (
-                                <>
-                                  {rowUpdate[key] !== undefined
-                                    ? rowUpdate[key]
-                                    : schema[key]}
-                                </>
+                                ''
                               )}
+                              <button
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  setSelectedCell('');
+                                  setCellUpdate({});
+                                }}
+                                onKeyPress={onKeyPressHandler(
+                                  (event: Event) => {
+                                    event.stopPropagation();
+                                    setSelectedCell('');
+                                    setCellUpdate({});
+                                  }
+                                )}
+                                type="button"
+                              >
+                                <Icon
+                                  path={mdiClose}
+                                  title="Cancel Edit"
+                                  size="1em"
+                                />
+                              </button>
+                              <button
+                                onClick={saveEditCallback}
+                                onKeyPress={onKeyPressHandler(saveEditCallback)}
+                                type="button"
+                              >
+                                <Icon
+                                  path={mdiCheck}
+                                  title="Save Edit"
+                                  size="1em"
+                                />
+                              </button>
                             </>
                           ) : (
-                            ''
+                            <>
+                              {rowUpdate[key] !== undefined
+                                ? rowUpdate[key]
+                                : schema[key]}
+                            </>
                           )}
                         </div>
                       </td>
@@ -396,34 +430,33 @@ export default function TablePanel({ name }: { name: string }) {
                               `${value}`
                             ) : (
                               <>
-                                {schema[key]?.includes('int') ||
-                                schema[key]?.includes('char') ? (
-                                  <>
-                                    {schema[key]?.includes('int') ? (
-                                      <input
-                                        type="number"
-                                        defaultValue={
-                                          rowUpdate[key] !== undefined
-                                            ? rowUpdate[key]
-                                            : `${value}`
-                                        }
-                                        min={0}
-                                        max={
-                                          schema[key]?.includes('(')
-                                            ? Number(
-                                                schema[key].match(
-                                                  /\((\d+)\)/
-                                                )![1]
-                                              )
-                                            : undefined
-                                        }
-                                        onChange={(event) =>
-                                          setCellUpdate({
-                                            [key]: event.target.value,
-                                          })
-                                        }
-                                      />
-                                    ) : (
+                                <>
+                                  {schema[key]?.includes('int') && (
+                                    <input
+                                      type="number"
+                                      defaultValue={
+                                        rowUpdate[key] !== undefined
+                                          ? rowUpdate[key]
+                                          : `${value}`
+                                      }
+                                      min={0}
+                                      max={
+                                        schema[key]?.includes('(')
+                                          ? Number(
+                                              schema[key].match(/\((\d+)\)/)![1]
+                                            )
+                                          : undefined
+                                      }
+                                      onChange={(event) =>
+                                        setCellUpdate({
+                                          [key]: event.target.value,
+                                        })
+                                      }
+                                    />
+                                  )}
+                                  {schema[key]?.includes('char') ||
+                                  schema[key]?.includes('text') ? (
+                                    <>
                                       <textarea
                                         autoComplete="on"
                                         // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -443,55 +476,51 @@ export default function TablePanel({ name }: { name: string }) {
                                             : `${value}`
                                         }
                                         onBlur={(event) => {
-                                          // onBlur called when textarea loses focus -> save updates
+                                          // onBlur when textarea loses focus -> save updates
                                           setCellUpdate({
                                             [key]: event.target.value,
                                           });
                                         }}
                                       />
-                                    )}
-                                    <button
-                                      onClick={(event) => {
+                                    </>
+                                  ) : (
+                                    ''
+                                  )}
+                                  <button
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      setSelectedCell('');
+                                      setCellUpdate({});
+                                    }}
+                                    onKeyPress={onKeyPressHandler(
+                                      (event: Event) => {
                                         event.stopPropagation();
                                         setSelectedCell('');
                                         setCellUpdate({});
-                                      }}
-                                      onKeyPress={onKeyPressHandler(
-                                        (event: Event) => {
-                                          event.stopPropagation();
-                                          setSelectedCell('');
-                                          setCellUpdate({});
-                                        }
-                                      )}
-                                      type="button"
-                                    >
-                                      <Icon
-                                        path={mdiClose}
-                                        title="Cancel Edit"
-                                        size="1em"
-                                      />
-                                    </button>
-                                    <button
-                                      onClick={saveEditCallback}
-                                      onKeyPress={onKeyPressHandler(
-                                        saveEditCallback
-                                      )}
-                                      type="button"
-                                    >
-                                      <Icon
-                                        path={mdiCheck}
-                                        title="Save Edit"
-                                        size="1em"
-                                      />
-                                    </button>
-                                  </>
-                                ) : (
-                                  <>
-                                    {rowUpdate[key] !== undefined
-                                      ? rowUpdate[key]
-                                      : `${value}`}
-                                  </>
-                                )}
+                                      }
+                                    )}
+                                    type="button"
+                                  >
+                                    <Icon
+                                      path={mdiClose}
+                                      title="Cancel Edit"
+                                      size="1em"
+                                    />
+                                  </button>
+                                  <button
+                                    onClick={saveEditCallback}
+                                    onKeyPress={onKeyPressHandler(
+                                      saveEditCallback
+                                    )}
+                                    type="button"
+                                  >
+                                    <Icon
+                                      path={mdiCheck}
+                                      title="Save Edit"
+                                      size="1em"
+                                    />
+                                  </button>
+                                </>
                               </>
                             )}
                           </>
@@ -566,7 +595,7 @@ export default function TablePanel({ name }: { name: string }) {
               ))}
             </tbody>
           </table>
-        </div>
+        </>
       )}
     </div>
   );
