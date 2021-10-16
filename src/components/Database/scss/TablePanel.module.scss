@@ -80,3 +80,22 @@
 .RequiredCell {
   color: red;
 }
+
+.EditCell {
+  display: grid;
+  grid-template-areas: 
+  "editor top"
+  "editor bottom";
+}
+
+.Editor {
+  grid-area: editor;
+}
+
+.ControlsTop {
+  grid-area: top;
+}
+
+.ControlsBottom {
+  grid-area: bottom;
+}

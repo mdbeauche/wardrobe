@@ -8,9 +8,13 @@ import {
   mdiCheck,
   mdiClose,
   mdiPlus,
+  mdiMessageOutline,
+  mdiMessageAlertOutline,
+  mdiArrowLeft,
+  mdiArrowRight,
 } from '@mdi/js';
 // import { useTypedSelector, useTypedDispatch } from '../../hooks/typedRedux';
-import { SERVER_URI, SERVER_PORT } from '../../config';
+import { SERVER_URI, SERVER_PORT, PAGINATION_SIZE } from '../../config';
 import Style from './scss/TablePanel.module.scss';
 
 interface Response {
@@ -25,7 +29,9 @@ interface TObject {
 
 export default function TablePanel({ name }: { name: string }) {
   const [schema, setSchema] = useState<TObject>({});
+  const [totalRecords, setTotalRecords] = useState(0);
   const [records, setRecords] = useState<Array<any>>([]);
+  const [currentPage, setCurrentPage] = useState(0);
   const [selectedRow, setSelectedRow] = useState('');
   const [selectedCell, setSelectedCell] = useState('');
   const [unlockedRow, setUnlockedRow] = useState('');
@@ -41,10 +47,10 @@ export default function TablePanel({ name }: { name: string }) {
     }
   };
 
-  const getSchema = () => {
+  const getData = () => {
     axios({
       method: 'get',
-      url: `${SERVER_URI}:${SERVER_PORT}/${name}/schema`,
+      url: `${SERVER_URI}:${SERVER_PORT}/${name}/data`,
     })
       .then((_response) =>
         _response.status === 200
@@ -54,14 +60,19 @@ export default function TablePanel({ name }: { name: string }) {
       .then((response: Response) => {
         if (response.success === true && Array.isArray(response.data)) {
           setSchema(response.data[0] as TObject);
+          setTotalRecords(response.data[1] as number);
+          setRecords(response.data[2] as Array<any>);
         }
       });
   };
 
-  const getRecords = () => {
+  const getRecords = (page: number) => {
     axios({
       method: 'get',
       url: `${SERVER_URI}:${SERVER_PORT}/${name}`,
+      params: {
+        page,
+      },
     })
       .then((_response) =>
         _response.status === 200
@@ -71,6 +82,7 @@ export default function TablePanel({ name }: { name: string }) {
       .then((response: Response) => {
         if (response.success === true && Array.isArray(response.data)) {
           setRecords(response.data);
+          setCurrentPage(page);
           // also reset selections
           setSelectedRow('');
           setSelectedCell('');
@@ -81,26 +93,29 @@ export default function TablePanel({ name }: { name: string }) {
       });
   };
 
-  const deleteRecord = (id: number) => () => {
-    axios({
-      method: 'post',
-      url: `${SERVER_URI}:${SERVER_PORT}/${name}/${id}/delete`,
-    })
-      .then((_response) =>
-        _response.status === 200
-          ? (_response.data as Response)
-          : ({ success: false } as Response)
-      )
-      .then((response: Response) => {
-        if (response.success) {
-          getRecords();
-          setSuccess(`Success: ${response.message}`);
-        } else {
-          console.log(`Failed to delete record ${id}: ${response.message}`);
-          setError(`Failed to delete record ${id}: ${response.message}`);
-        }
-      });
-  };
+  const deleteRecord = useCallback(
+    (id: number) => () => {
+      axios({
+        method: 'post',
+        url: `${SERVER_URI}:${SERVER_PORT}/${name}/${id}/delete`,
+      })
+        .then((_response) =>
+          _response.status === 200
+            ? (_response.data as Response)
+            : ({ success: false } as Response)
+        )
+        .then((response: Response) => {
+          if (response.success) {
+            getRecords(currentPage);
+            setSuccess(`Success: ${response.message}`);
+          } else {
+            console.log(`Failed to delete record ${id}: ${response.message}`);
+            setError(`Failed to delete record ${id}: ${response.message}`);
+          }
+        });
+    },
+    [currentPage]
+  );
 
   const updateRecord = useCallback(
     (id: number) => () => {
@@ -126,7 +141,7 @@ export default function TablePanel({ name }: { name: string }) {
         )
         .then((response: Response) => {
           if (response.success) {
-            getRecords();
+            getRecords(currentPage);
             setSuccess(`Success: updated record  ${id}`);
           } else {
             console.log(`Failed to update record ${id}: ${response.message}`);
@@ -134,7 +149,7 @@ export default function TablePanel({ name }: { name: string }) {
           }
         });
     },
-    [rowUpdate]
+    [rowUpdate, currentPage]
   );
 
   const createRecord = useCallback(() => {
@@ -150,7 +165,7 @@ export default function TablePanel({ name }: { name: string }) {
       )
       .then((response: Response) => {
         if (response.success) {
-          getRecords();
+          getRecords(currentPage);
           setCreateNewRow(false);
           setSuccess(`Success: ${response.message}`);
         } else {
@@ -158,7 +173,7 @@ export default function TablePanel({ name }: { name: string }) {
           setError(`Failed to create record: ${response.message}`);
         }
       });
-  }, [rowUpdate]);
+  }, [rowUpdate, currentPage]);
 
   const saveEditCallback = useCallback(
     (event) => {
@@ -170,8 +185,7 @@ export default function TablePanel({ name }: { name: string }) {
   );
 
   useEffect(() => {
-    getSchema();
-    getRecords();
+    getData();
   }, []);
 
   return (
@@ -179,7 +193,7 @@ export default function TablePanel({ name }: { name: string }) {
       {Object.keys(schema).length > 0 && (
         <>
           <h1>
-            Table: {name} [{records.length}]
+            Table: {name} [{totalRecords}]
           </h1>
           <table>
             <thead>
@@ -189,7 +203,7 @@ export default function TablePanel({ name }: { name: string }) {
                     type="button"
                     onClick={() => setCreateNewRow((prev) => !prev)}
                   >
-                    <Icon path={mdiPlus} title="Create Record" size="0.8em" />
+                    <Icon path={mdiPlus} title="Create Record" size="1.5em" />
                   </button>
                 </th>
                 <th>id</th>
@@ -200,11 +214,46 @@ export default function TablePanel({ name }: { name: string }) {
                     {`${key}`}
                   </th>
                 ))}
-                <th>&nbsp;</th>
+                {/* <th>&nbsp;</th> */}
+                <th>
+                  <button
+                    onClick={() => getRecords(currentPage - 1)}
+                    onKeyPress={onKeyPressHandler(() =>
+                      getRecords(currentPage - 1)
+                    )}
+                    disabled={currentPage <= 0}
+                    type="button"
+                  >
+                    <Icon
+                      path={mdiArrowLeft}
+                      title="Previous Page"
+                      size="1.5em"
+                    />
+                  </button>
+                  <button
+                    onClick={() => getRecords(currentPage + 1)}
+                    onKeyPress={onKeyPressHandler(() =>
+                      getRecords(currentPage + 1)
+                    )}
+                    disabled={
+                      totalRecords < (currentPage + 1) * PAGINATION_SIZE
+                    }
+                    type="button"
+                  >
+                    <Icon path={mdiArrowRight} title="Next Page" size="1.5em" />
+                  </button>
+                </th>
               </tr>
               {success !== '' && (
                 <tr className={Style.Success}>
-                  <td colSpan={Object.keys(schema).length + 4}>{success}</td>
+                  <td>
+                    <Icon
+                      path={mdiMessageOutline}
+                      title="Result Message"
+                      size="1.5em"
+                    />
+                  </td>
+                  <td colSpan={Object.keys(schema).length + 3}>{success}</td>
                   <td>
                     <button
                       onClick={() => setSuccess('')}
@@ -218,7 +267,14 @@ export default function TablePanel({ name }: { name: string }) {
               )}
               {error !== '' && (
                 <tr className={Style.Error}>
-                  <td colSpan={Object.keys(schema).length + 4}>{error}</td>
+                  <td>
+                    <Icon
+                      path={mdiMessageAlertOutline}
+                      title="Error Message"
+                      size="1.5em"
+                    />
+                  </td>
+                  <td colSpan={Object.keys(schema).length + 3}>{error}</td>
                   <td>
                     <button
                       onClick={() => setError('')}
@@ -401,19 +457,14 @@ export default function TablePanel({ name }: { name: string }) {
                   onKeyPress={onKeyPressHandler(() => setSelectedRow(row.id))}
                 >
                   <td>&nbsp;</td>
-                  {Object.entries(row).map(([key, value]) => (
+                  {['id', 'created_at', 'updated_at'].map((key) => (
                     <td
                       key={`${row.id}:${key}`}
-                      className={[
+                      className={
                         selectedCell === `${row.id}:${key}`
                           ? Style.SelectedCell
-                          : '',
-                        unlockedRow === row.id && rowUpdate[key] !== undefined
-                          ? Style.ModifiedCell
-                          : '',
-                      ]
-                        .filter((c) => c)
-                        .join()}
+                          : ''
+                      }
                     >
                       <div
                         onClick={() => setSelectedCell(`${row.id}:${key}`)}
@@ -423,118 +474,134 @@ export default function TablePanel({ name }: { name: string }) {
                         role="textbox"
                         tabIndex={0}
                       >
-                        {unlockedRow === row.id &&
-                        selectedCell === `${row.id}:${key}` ? (
-                          <>
-                            {key.includes('_at') || key === 'id' ? (
-                              `${value}`
-                            ) : (
-                              <>
-                                <>
-                                  {schema[key]?.includes('int') && (
-                                    <input
-                                      type="number"
-                                      defaultValue={
-                                        rowUpdate[key] !== undefined
-                                          ? rowUpdate[key]
-                                          : `${value}`
-                                      }
-                                      min={0}
-                                      max={
-                                        schema[key]?.includes('(')
-                                          ? Number(
-                                              schema[key].match(/\((\d+)\)/)![1]
-                                            )
-                                          : undefined
-                                      }
-                                      onChange={(event) =>
-                                        setCellUpdate({
-                                          [key]: event.target.value,
-                                        })
-                                      }
-                                    />
-                                  )}
-                                  {schema[key]?.includes('char') ||
-                                  schema[key]?.includes('text') ? (
-                                    <>
-                                      <textarea
-                                        autoComplete="on"
-                                        // eslint-disable-next-line jsx-a11y/no-autofocus
-                                        autoFocus
-                                        maxLength={
-                                          schema[key]?.includes('(')
-                                            ? Number(
-                                                schema[key].match(
-                                                  /\((\d+)\)/
-                                                )![1]
-                                              )
-                                            : undefined
-                                        }
-                                        defaultValue={
-                                          rowUpdate[key] !== undefined
-                                            ? rowUpdate[key]
-                                            : `${value}`
-                                        }
-                                        onBlur={(event) => {
-                                          // onBlur when textarea loses focus -> save updates
-                                          setCellUpdate({
-                                            [key]: event.target.value,
-                                          });
-                                        }}
-                                      />
-                                    </>
-                                  ) : (
-                                    ''
-                                  )}
-                                  <button
-                                    onClick={(event) => {
-                                      event.stopPropagation();
-                                      setSelectedCell('');
-                                      setCellUpdate({});
-                                    }}
-                                    onKeyPress={onKeyPressHandler(
-                                      (event: Event) => {
-                                        event.stopPropagation();
-                                        setSelectedCell('');
-                                        setCellUpdate({});
-                                      }
-                                    )}
-                                    type="button"
-                                  >
-                                    <Icon
-                                      path={mdiClose}
-                                      title="Cancel Edit"
-                                      size="1em"
-                                    />
-                                  </button>
-                                  <button
-                                    onClick={saveEditCallback}
-                                    onKeyPress={onKeyPressHandler(
-                                      saveEditCallback
-                                    )}
-                                    type="button"
-                                  >
-                                    <Icon
-                                      path={mdiCheck}
-                                      title="Save Edit"
-                                      size="1em"
-                                    />
-                                  </button>
-                                </>
-                              </>
-                            )}
-                          </>
-                        ) : (
-                          <>
-                            {unlockedRow === row.id &&
-                            rowUpdate[key] !== undefined
-                              ? rowUpdate[key]
-                              : `${value}`}
-                          </>
-                        )}
+                        {`${row[key]}`}
                       </div>
                     </td>
                   ))}
+                  {Object.entries(row)
+                    .filter(([key]) => !key.includes('_at') && key !== 'id')
+                    .map(([key, value]) => (
+                      <td
+                        key={`${row.id}:${key}`}
+                        className={[
+                          selectedCell === `${row.id}:${key}`
+                            ? Style.SelectedCell
+                            : '',
+                          unlockedRow === row.id && rowUpdate[key] !== undefined
+                            ? Style.ModifiedCell
+                            : '',
+                        ]
+                          .filter((c) => c)
+                          .join()}
+                      >
+                        <div
+                          onClick={() => setSelectedCell(`${row.id}:${key}`)}
+                          onKeyPress={onKeyPressHandler(() =>
+                            setSelectedCell(`${row.id}:${key}`)
+                          )}
+                          role="textbox"
+                          tabIndex={0}
+                        >
+                          {unlockedRow === row.id &&
+                          selectedCell === `${row.id}:${key}` ? (
+                            <>
+                              {schema[key]?.includes('int') && (
+                                <input
+                                  type="number"
+                                  defaultValue={
+                                    rowUpdate[key] !== undefined
+                                      ? rowUpdate[key]
+                                      : `${value}`
+                                  }
+                                  min={0}
+                                  max={
+                                    schema[key]?.includes('(')
+                                      ? Number(
+                                          schema[key].match(/\((\d+)\)/)![1]
+                                        )
+                                      : undefined
+                                  }
+                                  onChange={(event) =>
+                                    setCellUpdate({
+                                      [key]: event.target.value,
+                                    })
+                                  }
+                                />
+                              )}
+                              {schema[key]?.includes('char') ||
+                              schema[key]?.includes('text') ? (
+                                <>
+                                  <textarea
+                                    autoComplete="on"
+                                    // eslint-disable-next-line jsx-a11y/no-autofocus
+                                    autoFocus
+                                    maxLength={
+                                      schema[key]?.includes('(')
+                                        ? Number(
+                                            schema[key].match(/\((\d+)\)/)![1]
+                                          )
+                                        : undefined
+                                    }
+                                    defaultValue={
+                                      rowUpdate[key] !== undefined
+                                        ? rowUpdate[key]
+                                        : `${value}`
+                                    }
+                                    onBlur={(event) => {
+                                      // onBlur when textarea loses focus -> save updates
+                                      setCellUpdate({
+                                        [key]: event.target.value,
+                                      });
+                                    }}
+                                  />
+                                </>
+                              ) : (
+                                ''
+                              )}
+                              <button
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  setSelectedCell('');
+                                  setCellUpdate({});
+                                }}
+                                onKeyPress={onKeyPressHandler(
+                                  (event: Event) => {
+                                    event.stopPropagation();
+                                    setSelectedCell('');
+                                    setCellUpdate({});
+                                  }
+                                )}
+                                type="button"
+                              >
+                                <Icon
+                                  path={mdiClose}
+                                  title="Cancel Edit"
+                                  size="1em"
+                                />
+                              </button>
+                              <button
+                                onClick={saveEditCallback}
+                                onKeyPress={onKeyPressHandler(saveEditCallback)}
+                                type="button"
+                              >
+                                <Icon
+                                  path={mdiCheck}
+                                  title="Save Edit"
+                                  size="1em"
+                                />
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              {unlockedRow === row.id &&
+                              rowUpdate[key] !== undefined
+                                ? rowUpdate[key]
+                                : `${value}`}
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    ))}
                   <td>
                     <div
                       style={{
@@ -593,6 +660,44 @@ export default function TablePanel({ name }: { name: string }) {
                   </td>
                 </tr>
               ))}
+              {totalRecords > records.length ? (
+                <tr>
+                  <td colSpan={Object.keys(schema).length + 3} />
+                  <td>Page {currentPage}</td>
+                  <td>
+                    <button
+                      onClick={() => getRecords(currentPage - 1)}
+                      onKeyPress={onKeyPressHandler(() =>
+                        getRecords(currentPage - 1)
+                      )}
+                      disabled={currentPage <= 0}
+                      type="button"
+                    >
+                      <Icon
+                        path={mdiArrowLeft}
+                        title="Previous Page"
+                        size="1.5em"
+                      />
+                    </button>
+                    <button
+                      onClick={() => getRecords(currentPage + 1)}
+                      onKeyPress={onKeyPressHandler(() =>
+                        getRecords(currentPage + 1)
+                      )}
+                      disabled={
+                        totalRecords < (currentPage + 1) * PAGINATION_SIZE
+                      }
+                      type="button"
+                    >
+                      <Icon
+                        path={mdiArrowRight}
+                        title="Next Page"
+                        size="1.5em"
+                      />
+                    </button>
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </>
