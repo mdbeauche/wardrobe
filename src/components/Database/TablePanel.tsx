@@ -309,93 +309,101 @@ export default function TablePanel({ name }: { name: string }) {
                           tabIndex={0}
                         >
                           {selectedCell === `new:${key}` ? (
-                            <>
-                              {schema[key]?.includes('int') && (
-                                <input
-                                  type="number"
-                                  defaultValue={
-                                    rowUpdate[key] !== undefined
-                                      ? rowUpdate[key]
-                                      : ''
-                                  }
-                                  min={0}
-                                  max={
-                                    schema[key]?.includes('(')
-                                      ? Number(
-                                          schema[key].match(/\((\d+)\)/)![1]
-                                        )
-                                      : undefined
-                                  }
-                                  onChange={(event) =>
-                                    setCellUpdate({
-                                      [key]: event.target.value,
-                                    })
-                                  }
-                                />
-                              )}
-                              {schema[key]?.includes('char') ||
-                              schema[key]?.includes('text') ? (
-                                <>
-                                  <textarea
-                                    autoComplete="on"
-                                    // eslint-disable-next-line jsx-a11y/no-autofocus
-                                    autoFocus
-                                    maxLength={
+                            <div className={Style.EditCell}>
+                              <div className={Style.Editor}>
+                                {schema[key]?.includes('int') && (
+                                  <input
+                                    type="number"
+                                    defaultValue={
+                                      rowUpdate[key] !== undefined
+                                        ? rowUpdate[key]
+                                        : ''
+                                    }
+                                    min={0}
+                                    max={
                                       schema[key]?.includes('(')
                                         ? Number(
                                             schema[key].match(/\((\d+)\)/)![1]
                                           )
                                         : undefined
                                     }
-                                    defaultValue={
-                                      rowUpdate[key] !== undefined
-                                        ? rowUpdate[key]
-                                        : ''
-                                    }
-                                    onBlur={(event) => {
-                                      // onBlur called when textarea loses focus -> save updates
+                                    onChange={(event) =>
                                       setCellUpdate({
                                         [key]: event.target.value,
-                                      });
-                                    }}
+                                      })
+                                    }
                                   />
-                                </>
-                              ) : (
-                                ''
-                              )}
-                              <button
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  setSelectedCell('');
-                                  setCellUpdate({});
-                                }}
-                                onKeyPress={onKeyPressHandler(
-                                  (event: Event) => {
+                                )}
+                                {schema[key]?.includes('char') ||
+                                schema[key]?.includes('text') ? (
+                                  <>
+                                    <textarea
+                                      autoComplete="on"
+                                      // eslint-disable-next-line jsx-a11y/no-autofocus
+                                      autoFocus
+                                      maxLength={
+                                        schema[key]?.includes('(')
+                                          ? Number(
+                                              schema[key].match(/\((\d+)\)/)![1]
+                                            )
+                                          : undefined
+                                      }
+                                      defaultValue={
+                                        rowUpdate[key] !== undefined
+                                          ? rowUpdate[key]
+                                          : ''
+                                      }
+                                      onBlur={(event) => {
+                                        // onBlur called when textarea loses focus -> save updates
+                                        setCellUpdate({
+                                          [key]: event.target.value,
+                                        });
+                                      }}
+                                    />
+                                  </>
+                                ) : (
+                                  ''
+                                )}
+                              </div>
+                              <div className={Style.ControlsTop}>
+                                <button
+                                  onClick={(event) => {
                                     event.stopPropagation();
                                     setSelectedCell('');
                                     setCellUpdate({});
-                                  }
-                                )}
-                                type="button"
-                              >
-                                <Icon
-                                  path={mdiClose}
-                                  title="Cancel Edit"
-                                  size="1em"
-                                />
-                              </button>
-                              <button
-                                onClick={saveEditCallback}
-                                onKeyPress={onKeyPressHandler(saveEditCallback)}
-                                type="button"
-                              >
-                                <Icon
-                                  path={mdiCheck}
-                                  title="Save Edit"
-                                  size="1em"
-                                />
-                              </button>
-                            </>
+                                  }}
+                                  onKeyPress={onKeyPressHandler(
+                                    (event: Event) => {
+                                      event.stopPropagation();
+                                      setSelectedCell('');
+                                      setCellUpdate({});
+                                    }
+                                  )}
+                                  type="button"
+                                >
+                                  <Icon
+                                    path={mdiClose}
+                                    title="Cancel Edit"
+                                    size="1em"
+                                  />
+                                </button>
+                              </div>
+                              <div className={Style.ControlsBottom}>
+                                <button
+                                  onClick={saveEditCallback}
+                                  onKeyPress={onKeyPressHandler(
+                                    saveEditCallback
+                                  )}
+                                  type="button"
+                                >
+                                  <Icon
+                                    path={mdiCheck}
+                                    title="Save Edit"
+                                    size="1em"
+                                  />
+                                </button>
+                              </div>
+                            </div>
                           ) : (
                             <>
                               {rowUpdate[key] !== undefined
@@ -504,93 +512,101 @@ export default function TablePanel({ name }: { name: string }) {
                         >
                           {unlockedRow === row.id &&
                           selectedCell === `${row.id}:${key}` ? (
-                            <>
-                              {schema[key]?.includes('int') && (
-                                <input
-                                  type="number"
-                                  defaultValue={
-                                    rowUpdate[key] !== undefined
-                                      ? rowUpdate[key]
-                                      : `${value}`
-                                  }
-                                  min={0}
-                                  max={
-                                    schema[key]?.includes('(')
-                                      ? Number(
-                                          schema[key].match(/\((\d+)\)/)![1]
-                                        )
-                                      : undefined
-                                  }
-                                  onChange={(event) =>
-                                    setCellUpdate({
-                                      [key]: event.target.value,
-                                    })
-                                  }
-                                />
-                              )}
-                              {schema[key]?.includes('char') ||
-                              schema[key]?.includes('text') ? (
-                                <>
-                                  <textarea
-                                    autoComplete="on"
-                                    // eslint-disable-next-line jsx-a11y/no-autofocus
-                                    autoFocus
-                                    maxLength={
+                            <div className={Style.EditCell}>
+                              <div className={Style.Editor}>
+                                {schema[key]?.includes('int') && (
+                                  <input
+                                    type="number"
+                                    defaultValue={
+                                      rowUpdate[key] !== undefined
+                                        ? rowUpdate[key]
+                                        : `${value}`
+                                    }
+                                    min={0}
+                                    max={
                                       schema[key]?.includes('(')
                                         ? Number(
                                             schema[key].match(/\((\d+)\)/)![1]
                                           )
                                         : undefined
                                     }
-                                    defaultValue={
-                                      rowUpdate[key] !== undefined
-                                        ? rowUpdate[key]
-                                        : `${value}`
-                                    }
-                                    onBlur={(event) => {
-                                      // onBlur when textarea loses focus -> save updates
+                                    onChange={(event) =>
                                       setCellUpdate({
                                         [key]: event.target.value,
-                                      });
-                                    }}
+                                      })
+                                    }
                                   />
-                                </>
-                              ) : (
-                                ''
-                              )}
-                              <button
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  setSelectedCell('');
-                                  setCellUpdate({});
-                                }}
-                                onKeyPress={onKeyPressHandler(
-                                  (event: Event) => {
+                                )}
+                                {schema[key]?.includes('char') ||
+                                schema[key]?.includes('text') ? (
+                                  <>
+                                    <textarea
+                                      autoComplete="on"
+                                      // eslint-disable-next-line jsx-a11y/no-autofocus
+                                      autoFocus
+                                      maxLength={
+                                        schema[key]?.includes('(')
+                                          ? Number(
+                                              schema[key].match(/\((\d+)\)/)![1]
+                                            )
+                                          : undefined
+                                      }
+                                      defaultValue={
+                                        rowUpdate[key] !== undefined
+                                          ? rowUpdate[key]
+                                          : `${value}`
+                                      }
+                                      onBlur={(event) => {
+                                        // onBlur when textarea loses focus -> save updates
+                                        setCellUpdate({
+                                          [key]: event.target.value,
+                                        });
+                                      }}
+                                    />
+                                  </>
+                                ) : (
+                                  ''
+                                )}
+                              </div>
+                              <div className={Style.ControlsTop}>
+                                <button
+                                  onClick={(event) => {
                                     event.stopPropagation();
                                     setSelectedCell('');
                                     setCellUpdate({});
-                                  }
-                                )}
-                                type="button"
-                              >
-                                <Icon
-                                  path={mdiClose}
-                                  title="Cancel Edit"
-                                  size="1em"
-                                />
-                              </button>
-                              <button
-                                onClick={saveEditCallback}
-                                onKeyPress={onKeyPressHandler(saveEditCallback)}
-                                type="button"
-                              >
-                                <Icon
-                                  path={mdiCheck}
-                                  title="Save Edit"
-                                  size="1em"
-                                />
-                              </button>
-                            </>
+                                  }}
+                                  onKeyPress={onKeyPressHandler(
+                                    (event: Event) => {
+                                      event.stopPropagation();
+                                      setSelectedCell('');
+                                      setCellUpdate({});
+                                    }
+                                  )}
+                                  type="button"
+                                >
+                                  <Icon
+                                    path={mdiClose}
+                                    title="Cancel Edit"
+                                    size="1em"
+                                  />
+                                </button>
+                              </div>
+                              <div className={Style.ControlsBottom}>
+                                <button
+                                  onClick={saveEditCallback}
+                                  onKeyPress={onKeyPressHandler(
+                                    saveEditCallback
+                                  )}
+                                  type="button"
+                                >
+                                  <Icon
+                                    path={mdiCheck}
+                                    title="Save Edit"
+                                    size="1em"
+                                  />
+                                </button>
+                              </div>
+                            </div>
                           ) : (
                             <>
                               {unlockedRow === row.id &&
