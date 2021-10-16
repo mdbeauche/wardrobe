@@ -1,0 +1,24 @@
+// @import "src/scss/component-utilities";
+// @import "src/scss/button";
+
+$error-color: "red";
+
+.Error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  // background-color: $background-color;
+  // min-height: $canvas-height;
+  // padding: rem(75) 0 $desktop-spacing 0;
+  margin: 0 auto;
+  text-align: center;
+
+  // @include media-max("breakpoint") {
+  //   padding: rem(35) 0 $desktop-spacing 0;
+  // }
+
+  h2 {
+    color: $error-color;
+  }
+}

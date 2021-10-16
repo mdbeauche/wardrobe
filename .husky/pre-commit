@@ -1,0 +1,8 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "Husky pre-commit hooks"
+echo "Formatting staged files with ESLint"
+npx eslint --ext .js,.jsx,.ts,.tsx src/ --cache --fix
+echo "Formatting staged files with Prettier"
+npx pretty-quick --pattern "src/**/*.*(js|jsx|ts|tsx)" --staged
