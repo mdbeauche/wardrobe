@@ -1,18 +1,14 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-// import Icon from '@mdi/react';
-// import { mdiDatabaseEdit } from '@mdi/js';
-import { SERVER_URI, SERVER_PORT } from '../../config';
+import React, { useState, useEffect } from 'react';
+import { Redirect, useParams } from 'react-router-dom';
+import { useTypedSelector, useTypedDispatch } from '../../hooks/typedRedux';
+import { UserState, login } from '../../store/slices/userSlice';
 import Style from './scss/Auth.module.scss';
 
-interface Response {
-  success: boolean;
-  message: String;
-  data: Array<Object>;
-}
-
 const Auth = () => {
-  const [error, setError] = useState(null);
+  const { redirect } = useParams<{ redirect?: string }>();
+  const user = useTypedSelector((state) => state.user as UserState);
+  const dispatch = useTypedDispatch();
+  const [authenticated, setAuthenticated] = useState(user.isAuthenticated);
 
   const onKeyPressHandler = (fn: Function) => (event: { key: string }) => {
     if (event.key === 'Enter') {
@@ -20,50 +16,46 @@ const Auth = () => {
     }
   };
 
-  const login = (event: React.ChangeEvent<any>) => {
+  const loginUser = (event: React.ChangeEvent<any>) => {
     event.preventDefault();
 
-    // TODO: move into the store
-    axios({
-      method: 'post',
-      url: `${SERVER_URI}:${SERVER_PORT}/login`,
-      data: {
+    dispatch(
+      login({
         email: event.target.form.email.value,
         password: event.target.form.password.value,
-      },
-    })
-      .then((_response) =>
-        _response.status === 200
-          ? (_response.data as Response)
-          : ({ success: false } as Response)
-      )
-      .then((response: Response) => {
-        if (response.success === false) {
-          console.log('fail response');
-        }
-
-        if (response.success === true && Array.isArray(response.data)) {
-          console.log('success response');
-          console.log(response.data);
-        }
       })
-      .catch((err) => {
-        setError(err.message);
-      });
+    );
   };
+
+  useEffect(() => {
+    if (user.isAuthenticated) {
+      setAuthenticated(true);
+    }
+  }, [user.isAuthenticated]);
+
+  if (authenticated) {
+    return (
+      <Redirect
+        to={{
+          pathname: redirect !== undefined ? `/${redirect}` : '/',
+          state: { authenticated: true },
+        }}
+      />
+    );
+  }
 
   return (
     <div className={Style.Auth}>
       <form>
         <div>
           <label htmlFor="email">
-            Email:
+            Email:&nbsp;
             <input id="email" type="email" name="email" />
           </label>
         </div>
         <div>
           <label htmlFor="password">
-            Password:
+            Password:&nbsp;
             <input id="password" type="password" name="password" />
           </label>
         </div>
@@ -71,13 +63,18 @@ const Auth = () => {
           <button
             type="submit"
             name="Log In"
-            onClick={login}
-            onKeyPress={onKeyPressHandler(login)}
+            onClick={loginUser}
+            onKeyPress={onKeyPressHandler(loginUser)}
           >
             Log In
           </button>
         </div>
-        {error && <div>Error: {JSON.stringify(error)}</div>}
+        <div
+          className={Style.Error}
+          style={{ visibility: user.error ? 'visible' : 'hidden' }}
+        >
+          Error: {JSON.stringify(user.errorMessage)}
+        </div>
       </form>
     </div>
   );

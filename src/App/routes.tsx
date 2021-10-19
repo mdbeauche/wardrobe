@@ -1,12 +1,10 @@
 // import { lazy } from "react";
-// import { Redirect } from "react-router-dom";
+import { Redirect } from 'react-router-dom';
 import Sandbox from '../views/Sandbox';
 import Auth from '../components/Auth/Auth';
-// import HomePage from '../Home/HomePage';
 // import Loader from '../Loader/Loader';
 
 // const LazyPage = lazy(() => import('../Booth/LazyPage'));
-// const ShowcasePage = lazy(() => import('../Booth/ShowcasePage'));
 
 const routes = [
   // {
@@ -24,12 +22,12 @@ const routes = [
     name: 'Sandbox',
     component: Sandbox,
     params: {
-      isAuth: false,
+      isAuth: true,
     },
   },
   {
-    path: '/login',
-    exact: true,
+    path: '/login/:redirect?',
+    exact: false,
     name: 'Login',
     component: Auth,
     params: {
@@ -47,24 +45,24 @@ const routes = [
   // },
 ];
 
-// const route404 = {
-//   path: "/*",
-//   name: "Not Found",
-//   component: () => {
-//     return (
-//       <Redirect
-//         to={{
-//           pathname: "/",
-//         }}
-//       />
-//     );
-//   },
-//   params: {
-//     isAuth: false,
-//   },
-// };
+const route404 = {
+  path: '/*',
+  name: 'Not Found',
+  exact: false,
+  component: () => (
+    <Redirect
+      to={{
+        pathname: `/`,
+        state: { authenticated: false },
+      }}
+    />
+  ),
+  params: {
+    isAuth: false,
+  },
+};
 
 // needs to go last in <Switch> list
-// routes.push(route404);
+routes.push(route404);
 
 export default routes;
