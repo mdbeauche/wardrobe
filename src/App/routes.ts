@@ -1,10 +1,11 @@
 // import { lazy } from "react";
 // import { Redirect } from "react-router-dom";
 import Sandbox from '../views/Sandbox';
+import Auth from '../components/Auth/Auth';
 // import HomePage from '../Home/HomePage';
 // import Loader from '../Loader/Loader';
 
-// const PharmacyPage = lazy(() => import('../Booth/PharmacyPage'));
+// const LazyPage = lazy(() => import('../Booth/LazyPage'));
 // const ShowcasePage = lazy(() => import('../Booth/ShowcasePage'));
 
 const routes = [
@@ -26,20 +27,20 @@ const routes = [
       isAuth: false,
     },
   },
+  {
+    path: '/login',
+    exact: true,
+    name: 'Login',
+    component: Auth,
+    params: {
+      isAuth: false,
+    },
+  },
   // {
-  //   path: '/Pharmacy',
+  //   path: '/Lazy',
   //   exact: true,
-  //   name: 'Pharmacy',
-  //   component: PharmacyPage,
-  //   params: {
-  //     isAuth: false,
-  //   },
-  // },
-  // {
-  //   path: '/Showcase',
-  //   exact: true,
-  //   name: 'Showcase',
-  //   component: ShowcasePage,
+  //   name: 'Lazy',
+  //   component: LazyPage,
   //   params: {
   //     isAuth: false,
   //   },
