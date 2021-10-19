@@ -50,7 +50,7 @@ export default function TablePanel({ name }: { name: string }) {
   const getData = () => {
     axios({
       method: 'get',
-      url: `${SERVER_URI}:${SERVER_PORT}/${name}/data`,
+      url: `${SERVER_URI}:${SERVER_PORT}/table/${name}/data`,
     })
       .then((_response) =>
         _response.status === 200
@@ -69,7 +69,7 @@ export default function TablePanel({ name }: { name: string }) {
   const getRecords = (page: number) => {
     axios({
       method: 'get',
-      url: `${SERVER_URI}:${SERVER_PORT}/${name}`,
+      url: `${SERVER_URI}:${SERVER_PORT}/table/${name}`,
       params: {
         page,
       },
@@ -97,7 +97,7 @@ export default function TablePanel({ name }: { name: string }) {
     (id: number) => () => {
       axios({
         method: 'post',
-        url: `${SERVER_URI}:${SERVER_PORT}/${name}/${id}/delete`,
+        url: `${SERVER_URI}:${SERVER_PORT}/table/${name}/${id}/delete`,
       })
         .then((_response) =>
           _response.status === 200
@@ -129,7 +129,7 @@ export default function TablePanel({ name }: { name: string }) {
 
       axios({
         method: 'post',
-        url: `${SERVER_URI}:${SERVER_PORT}/${name}/${id}/update`,
+        url: `${SERVER_URI}:${SERVER_PORT}/table/${name}/${id}/update`,
         data: {
           updates,
         },
@@ -155,7 +155,7 @@ export default function TablePanel({ name }: { name: string }) {
   const createRecord = useCallback(() => {
     axios({
       method: 'post',
-      url: `${SERVER_URI}:${SERVER_PORT}/${name}/create`,
+      url: `${SERVER_URI}:${SERVER_PORT}/table/${name}/create`,
       data: { record: rowUpdate },
     })
       .then((_response) =>
@@ -230,6 +230,13 @@ export default function TablePanel({ name }: { name: string }) {
                       size="1.5em"
                     />
                   </button>
+                  <input
+                    type="number"
+                    min={0}
+                    max={Math.ceil(totalRecords / PAGINATION_SIZE)}
+                    value={currentPage}
+                    onChange={(event) => getRecords(Number(event.target.value))}
+                  />
                   <button
                     onClick={() => getRecords(currentPage + 1)}
                     onKeyPress={onKeyPressHandler(() =>
@@ -678,8 +685,7 @@ export default function TablePanel({ name }: { name: string }) {
               ))}
               {totalRecords > records.length ? (
                 <tr>
-                  <td colSpan={Object.keys(schema).length + 3} />
-                  <td>Page {currentPage}</td>
+                  <td colSpan={Object.keys(schema).length + 4} />
                   <td>
                     <button
                       onClick={() => getRecords(currentPage - 1)}
@@ -695,6 +701,15 @@ export default function TablePanel({ name }: { name: string }) {
                         size="1.5em"
                       />
                     </button>
+                    <input
+                      type="number"
+                      min={0}
+                      max={Math.ceil(totalRecords / PAGINATION_SIZE)}
+                      value={currentPage}
+                      onChange={(event) =>
+                        getRecords(Number(event.target.value))
+                      }
+                    />
                     <button
                       onClick={() => getRecords(currentPage + 1)}
                       onKeyPress={onKeyPressHandler(() =>

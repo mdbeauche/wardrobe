@@ -23,7 +23,6 @@ const DatabasePanel = () => {
   };
 
   useEffect(() => {
-    // TODO: move into the store
     // get list of databases
     axios({
       method: 'get',
