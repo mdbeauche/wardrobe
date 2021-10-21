@@ -1,0 +1,42 @@
+.BlogContainer {
+  height: 100%;
+  width: 100%;
+}
+
+.TotalBlogPosts {
+  width: 60%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.BlogTitle {
+  width: 100%;
+}
+
+.BlogPost {
+  width: 100%;
+  text-align: justify;
+}
+
+.BlogPostBody {
+  display: block;
+  font-size: small;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow: hidden;
+  height: 10.0em;
+  line-height: 1.0em;
+}
+
+.Timestamp {
+  font-size: small;
+  font-style: italic;
+  font-weight: lighter;
+}
+
+.Controls {
+  margin-left: auto;
+}

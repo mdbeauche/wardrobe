@@ -1,0 +1,8 @@
+@import "src/App/scss/variables";
+
+.Home {
+  position: relative;
+  margin-top: calc($header-height + 20px);
+  height: calc(100vh - $header-height - 20px);
+  max-height: calc(100vh - $header-height - 20px);
+}

@@ -1,11 +1,10 @@
-import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import { useTypedSelector } from '../hooks/typedRedux';
 import { UserState } from '../store/slices/userSlice';
 import ContentWrapper from '../components/ContentWrapper/ContentWrapper';
 import Loader from '../components/Loader/Loader';
 import routes from './routes';
-import './App.scss';
+import './scss/index.scss';
 
 const App = () => {
   const { isAuthenticated, pending } = useTypedSelector(
@@ -31,7 +30,7 @@ const App = () => {
               if (!isAuth || (isAuth && isAuthenticated)) {
                 return (
                   <ContentWrapper>
-                    <route.component key={Date.now()} />
+                    <route.component key={new Date().getUTCMilliseconds()} />
                   </ContentWrapper>
                 );
               }

@@ -2,12 +2,17 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { SERVER_URI, SERVER_PORT } from '../../config';
 
+export interface UserData {
+  id: number;
+  email: string;
+}
+
 export interface UserState {
   isAuthenticated: boolean;
   pending: boolean;
   error: boolean;
   errorMessage: string;
-  data: object;
+  data: UserData;
 }
 
 const initialState: UserState = {
@@ -15,7 +20,7 @@ const initialState: UserState = {
   pending: false,
   error: false,
   errorMessage: '',
-  data: {},
+  data: {} as UserData,
 };
 
 interface Response {
@@ -40,7 +45,7 @@ const login = createAsyncThunk(
       const responseData: Response = response.data as Response;
 
       if (responseData.success) {
-        return responseData.data;
+        return responseData.data[0];
       }
     }
 
@@ -60,7 +65,7 @@ const userSlice = createSlice({
     clearUser(state) {
       state.isAuthenticated = false;
       state.pending = false;
-      state.data = {};
+      state.data = {} as UserData;
     },
   },
   extraReducers: (builder) => {
@@ -68,7 +73,7 @@ const userSlice = createSlice({
       state.pending = true;
     });
     builder.addCase(login.fulfilled, (state, action: PayloadAction<object>) => {
-      state.data = action.payload;
+      state.data = action.payload as UserData;
       state.isAuthenticated = true;
       state.pending = false;
     });
