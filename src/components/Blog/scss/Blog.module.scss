@@ -1,0 +1,51 @@
+.BlogContainer {
+  height: 100%;
+  width: 100%;
+}
+
+.Blog {
+  width: 60%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.BlogTitle {
+  width: 100%;
+  text-align: center;
+}
+
+.BlogPostMain {
+  width: 100%;
+}
+
+.BlogPostMainBody {
+  width: 100%;
+}
+
+.OlderPosts {
+  width: 100%;
+}
+
+.OlderPost {
+  display: block;
+  width: 100%;
+  font-size: small;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  overflow: hidden;
+  height: 5.0em;
+  line-height: 1.0em;
+}
+
+.Timestamp {
+  font-size: small;
+  font-style: italic;
+  font-weight: lighter;
+}
+
+.Controls {
+  margin-left: auto;
+}

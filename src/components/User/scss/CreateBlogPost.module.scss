@@ -1,0 +1,26 @@
+.CreateBlogPost {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  input {
+    width: 80%;
+  }
+}
+
+.EditorWrapper {
+  flex-grow: 2;
+}
+
+.EditorBody {
+  height: 60%;
+}
+
+.EditorToolbar {
+
+}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { ViewportContext } from '../../context/ViewportContext';
 import Error from '../Error/Error';
+import Home from '../../views/Home';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -35,7 +36,9 @@ const ContentWrapperInner = ({ children }) => (
 
 const ContentWrapper = ({ children }) => (
   <ViewportContext>
-    <ContentWrapperInner>{children}</ContentWrapperInner>
+    <ContentWrapperInner>
+      <Home>{children}</Home>
+    </ContentWrapperInner>
   </ViewportContext>
 );
 

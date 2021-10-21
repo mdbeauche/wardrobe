@@ -47,6 +47,8 @@ export default function TablePanel({ name }: { name: string }) {
     }
   };
 
+  // TODO: move all data records to store
+
   const getData = () => {
     axios({
       method: 'get',
@@ -60,8 +62,8 @@ export default function TablePanel({ name }: { name: string }) {
       .then((response: Response) => {
         if (response.success === true && Array.isArray(response.data)) {
           setSchema(response.data[0] as TObject);
-          setTotalRecords(response.data[1] as number);
-          setRecords(response.data[2] as Array<any>);
+          setRecords(response.data[1] as Array<any>);
+          setTotalRecords(response.data[2] as number);
         }
       });
   };
