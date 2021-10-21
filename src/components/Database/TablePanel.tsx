@@ -83,7 +83,7 @@ export default function TablePanel({ name }: { name: string }) {
       )
       .then((response: Response) => {
         if (response.success === true && Array.isArray(response.data)) {
-          setRecords(response.data);
+          setRecords(response.data[0] as any);
           setCurrentPage(page);
           // also reset selections
           setSelectedRow('');
