@@ -30,17 +30,21 @@ const CreateBlogPost = () => {
     EditorState.createEmpty()
   );
   const [title, setTitle] = useState(`New Post ${new Date().toDateString()}`);
+  const [postCreated, setPostCreated] = useState(false);
+  const [postPreview, setPostPreview] = useState('');
+  const [error, setError] = useState('');
 
   const saveBlogPost = useCallback(() => {
     const html = convertToHTML(editorState.getCurrentContent());
+    const body = DOMPurify.sanitize(html);
 
     const blogPost = {
       author: user.data.id,
       title,
-      body: DOMPurify.sanitize(html),
+      body,
     };
 
-    console.log('blogPost:', blogPost);
+    setPostPreview(body);
 
     axios({
       method: 'post',
@@ -54,45 +58,67 @@ const CreateBlogPost = () => {
       )
       .then((response: Response) => {
         if (response.success) {
-          console.log('Successfully saved blog post');
+          setPostCreated(true);
         } else {
-          console.log(`Failed to create record: ${response.message}`);
+          setError(`Failed to create record: ${response.message}`);
         }
       });
   }, [title, editorState]);
 
   return (
     <div className={Style.CreateBlogPost}>
-      <div>
-        <h1>Write a blog post about it</h1>
-        <h2>
-          Title:{' '}
-          <input
-            type="text"
-            defaultValue={title}
-            maxLength={255}
-            onChange={(event) => setTitle(event.target.value)}
+      {postCreated === false ? (
+        <>
+          <div>
+            <h1>Write a blog post about it</h1>
+            <h2>
+              Title:{' '}
+              <input
+                type="text"
+                defaultValue={title}
+                maxLength={255}
+                onChange={(event) => setTitle(event.target.value)}
+              />
+            </h2>
+            <h3>as {user.data.email}</h3>
+          </div>
+          <Editor
+            editorState={editorState}
+            onEditorStateChange={setEditorState}
+            wrapperClassName={Style.EditorWrapper}
+            editorClassName={Style.EditorBody}
+            toolbarClassName={Style.EditorToolbar}
           />
-        </h2>
-        <h3>as {user.data.email}</h3>
-      </div>
-      <Editor
-        editorState={editorState}
-        onEditorStateChange={setEditorState}
-        wrapperClassName={Style.EditorWrapper}
-        editorClassName={Style.EditorBody}
-        toolbarClassName={Style.EditorToolbar}
-      />
-      <div>
-        <button
-          type="button"
-          onClick={saveBlogPost}
-          onKeyPress={onKeyPressHandler(saveBlogPost)}
-        >
-          <Icon path={mdiContentSave} title="Create Blog Post" size="1.5em" />
-          &nbsp;Create Blog Post
-        </button>
-      </div>
+          <div>
+            <button
+              type="button"
+              onClick={saveBlogPost}
+              onKeyPress={onKeyPressHandler(saveBlogPost)}
+            >
+              <Icon
+                path={mdiContentSave}
+                title="Create Blog Post"
+                size="1.5em"
+              />
+              &nbsp;Create Blog Post
+            </button>
+            {error !== '' && <span>{error}</span>}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={Style.BlogPostMain}>
+            <h1>Preview:</h1>
+            <h2>{title}</h2>
+            <div
+              className={Style.BlogPostMainBody}
+              // text was sanitized with dompurify before being saved in database
+              // eslint-disable-next-line react/no-danger
+              dangerouslySetInnerHTML={{ __html: postPreview }}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 };
