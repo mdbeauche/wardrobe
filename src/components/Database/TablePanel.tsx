@@ -99,7 +99,7 @@ export default function TablePanel({ name }: { name: string }) {
     (id: number) => () => {
       axios({
         method: 'post',
-        url: `${SERVER_URI}:${SERVER_PORT}/table/${name}/${id}/delete`,
+        url: `${SERVER_URI}:${SERVER_PORT}/table/${name}/delete/${id}`,
       })
         .then((_response) =>
           _response.status === 200
@@ -131,7 +131,7 @@ export default function TablePanel({ name }: { name: string }) {
 
       axios({
         method: 'post',
-        url: `${SERVER_URI}:${SERVER_PORT}/table/${name}/${id}/update`,
+        url: `${SERVER_URI}:${SERVER_PORT}/table/${name}/update/${id}`,
         data: {
           updates,
         },

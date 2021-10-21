@@ -12,7 +12,6 @@ interface Response {
 
 const Blog = () => {
   const { id = '0' } = useParams<{ id?: string }>();
-  // console.log('params:', params);
 
   const [blogPost, setBlogPost] = useState<any>({});
 

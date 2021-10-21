@@ -7,6 +7,8 @@ import TotalBlogPosts from '../components/Blog/TotalBlogPosts';
 import SingleBlogPost from '../components/Blog/SingleBlogPost';
 import User from '../components/User/User';
 import CreateBlogPost from '../components/User/CreateBlogPost';
+import EditBlogPost from '../components/User/EditBlogPost';
+import EditAllBlogPosts from '../components/User/EditAllBlogPosts';
 // import Loader from '../Loader/Loader';
 
 // const LazyPage = lazy(() => import('../Booth/LazyPage'));
@@ -58,6 +60,15 @@ const routes = [
     },
   },
   {
+    path: '/blog/edit/:id',
+    exact: true,
+    name: 'EditBlogPost',
+    component: EditBlogPost,
+    params: {
+      isAuth: true,
+    },
+  },
+  {
     path: '/blog/:id',
     exact: false,
     name: 'SingleBlogPost',
@@ -80,6 +91,15 @@ const routes = [
     exact: true,
     name: 'Create Blog Post',
     component: CreateBlogPost,
+    params: {
+      isAuth: true,
+    },
+  },
+  {
+    path: '/user/editAllBlogPosts',
+    exact: true,
+    name: 'Edit All Blog Posts',
+    component: EditAllBlogPosts,
     params: {
       isAuth: true,
     },

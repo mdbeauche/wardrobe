@@ -1,5 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import { EditorState } from 'draft-js';
+import { stateFromHTML } from 'draft-js-import-html';
 import { Editor } from 'react-draft-wysiwyg';
 import { convertToHTML } from 'draft-convert';
 import DOMPurify from 'dompurify';
@@ -9,8 +11,9 @@ import { mdiContentSave } from '@mdi/js';
 import '../../../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import { useTypedSelector } from '../../hooks/typedRedux';
 import { UserState } from '../../store/slices/userSlice';
+import Error from '../Error/Error';
 import { SERVER_URI, SERVER_PORT } from '../../config';
-import Style from './scss/CreateBlogPost.module.scss';
+import Style from './scss/EditBlogPost.module.scss';
 
 interface Response {
   success: boolean;
@@ -24,32 +27,63 @@ const onKeyPressHandler = (fn: Function) => (event: { key: string }) => {
   }
 };
 
-const CreateBlogPost = () => {
+const EditBlogPost = () => {
+  const { id = '0' } = useParams<{ id?: string }>();
   const user = useTypedSelector((state) => state.user as UserState);
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   );
+  const [author, setAuthor] = useState(-1);
   const [title, setTitle] = useState(`New Post ${new Date().toDateString()}`);
   const [postCreated, setPostCreated] = useState(false);
   const [postPreview, setPostPreview] = useState('');
   const [error, setError] = useState('');
 
-  const saveBlogPost = useCallback(() => {
+  const getBlogPost = (postId: string) => {
+    axios({
+      method: 'get',
+      url: `${SERVER_URI}:${SERVER_PORT}/table/blog_posts/${postId}`,
+    })
+      .then((_response) =>
+        _response.status === 200
+          ? (_response.data as Response)
+          : ({ success: false } as Response)
+      )
+      .then((response: Response) => {
+        if (response.success === true && Array.isArray(response.data)) {
+          const post = response.data[0] as {
+            author: number;
+            title: string;
+            body: string;
+          };
+
+          setAuthor(post.author);
+
+          setTitle(post.title);
+
+          setEditorState(
+            EditorState.createWithContent(stateFromHTML(post.body))
+          );
+        }
+      });
+  };
+
+  const saveEditedBlogPost = useCallback(() => {
     const html = convertToHTML(editorState.getCurrentContent());
     const body = DOMPurify.sanitize(html);
-
-    const blogPost = {
-      author: user.data.id,
-      title,
-      body,
-    };
 
     setPostPreview(body);
 
     axios({
       method: 'post',
-      url: `${SERVER_URI}:${SERVER_PORT}/table/blog_posts/create`,
-      data: { record: blogPost },
+      url: `${SERVER_URI}:${SERVER_PORT}/table/blog_posts/update/${id}`,
+      data: {
+        id,
+        updates: [
+          { field: 'title', value: title },
+          { field: 'body', value: body },
+        ],
+      },
     })
       .then((_response) =>
         _response.status === 200
@@ -60,17 +94,32 @@ const CreateBlogPost = () => {
         if (response.success) {
           setPostCreated(true);
         } else {
-          setError(`Failed to create record: ${response.message}`);
+          setError(`Failed to update record: ${response.message}`);
         }
       });
   }, [title, editorState]);
 
+  useEffect(() => {
+    getBlogPost(id);
+  }, []);
+
+  if (author !== -1) {
+    if (user.data.id !== author) {
+      return (
+        <Error
+          error="You are not the author of this post."
+          location={window.location}
+        />
+      );
+    }
+  }
+
   return (
-    <div className={Style.CreateBlogPostContainer}>
+    <div className={Style.EditBlogPostContainer}>
       {postCreated === false ? (
-        <div className={Style.CreateBlogPost}>
+        <div className={Style.EditBlogPost}>
           <div>
-            <h1>Write a blog post about it</h1>
+            <h1>Edit your blog post</h1>
             <h2>
               Title:{' '}
               <input
@@ -92,21 +141,21 @@ const CreateBlogPost = () => {
           <div>
             <button
               type="button"
-              onClick={saveBlogPost}
-              onKeyPress={onKeyPressHandler(saveBlogPost)}
+              onClick={saveEditedBlogPost}
+              onKeyPress={onKeyPressHandler(saveEditedBlogPost)}
             >
               <Icon
                 path={mdiContentSave}
-                title="Create Blog Post"
+                title="Update Blog Post"
                 size="1.5em"
               />
-              &nbsp;Create Blog Post
+              &nbsp;Update Blog Post
             </button>
             {error !== '' && <span>{error}</span>}
           </div>
         </div>
       ) : (
-        <div className={Style.CreateBlogPost}>
+        <div className={Style.EditBlogPost}>
           <div className={Style.BlogPostMain}>
             <h1>Preview:</h1>
             <h2>{title}</h2>
@@ -123,4 +172,4 @@ const CreateBlogPost = () => {
   );
 };
 
-export default CreateBlogPost;
+export default EditBlogPost;

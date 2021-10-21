@@ -1,13 +1,19 @@
-.UserContainer {
+.EditAllBlogPostsContainer {
   height: 100%;
   width: 100%;
 }
 
-.User {
+.EditAllBlogPosts {
   width: 60%;
   margin: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.Timestamp {
+  font-size: small;
+  font-style: italic;
+  font-weight: lighter;
 }

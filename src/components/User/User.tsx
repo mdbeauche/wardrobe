@@ -3,33 +3,38 @@ import { useTypedSelector } from '../../hooks/typedRedux';
 import { UserState } from '../../store/slices/userSlice';
 import Style from './scss/User.module.scss';
 
-const Auth = () => {
+const User = () => {
   const user = useTypedSelector((state) => state.user as UserState);
 
   return (
-    <div className={Style.User}>
-      <h1>
-        {user.isAuthenticated ? (
-          <>
-            <div>User: {`${user.data.email} [${user.data.id}]`}</div>
-            <div>
-              <ul>
-                Links:
-                <li>
-                  <Link title="Create Blog Post" to="user/createBlogPost">
-                    Create Blog Post
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <code>{JSON.stringify(user)}</code>
-          </>
-        ) : (
-          <>Not currently authenticated</>
-        )}
-      </h1>
+    <div className={Style.UserContainer}>
+      {user.isAuthenticated ? (
+        <div className={Style.User}>
+          <div>
+            <h1>User: {`${user.data.email} [${user.data.id}]`}</h1>
+          </div>
+          <div>
+            <ul>
+              Links:
+              <li>
+                <Link title="Create Blog Post" to="user/createBlogPost">
+                  Create Blog Post
+                </Link>
+              </li>
+              <li>
+                <Link title="Edit Blog Posts" to="user/editAllBlogPosts">
+                  Edit Your Blog Posts
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <code>{JSON.stringify(user)}</code>
+        </div>
+      ) : (
+        <div className={Style.User}>Not currently authenticated</div>
+      )}
     </div>
   );
 };
 
-export default Auth;
+export default User;
