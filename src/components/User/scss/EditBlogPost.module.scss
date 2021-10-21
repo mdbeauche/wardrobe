@@ -1,7 +1,11 @@
-.CreateBlogPost {
-  position: relative;
-  width: 100%;
+.EditBlogPostContainer {
   height: 100%;
+  width: 100%;
+}
+
+.EditBlogPost {
+  width: 60%;
+  margin: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;

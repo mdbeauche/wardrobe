@@ -115,9 +115,9 @@ const EditBlogPost = () => {
   }
 
   return (
-    <div className={Style.EditBlogPost}>
+    <div className={Style.EditBlogPostContainer}>
       {postCreated === false ? (
-        <>
+        <div className={Style.EditBlogPost}>
           <div>
             <h1>Edit your blog post</h1>
             <h2>
@@ -153,9 +153,9 @@ const EditBlogPost = () => {
             </button>
             {error !== '' && <span>{error}</span>}
           </div>
-        </>
+        </div>
       ) : (
-        <>
+        <div className={Style.EditBlogPost}>
           <div className={Style.BlogPostMain}>
             <h1>Preview:</h1>
             <h2>{title}</h2>
@@ -166,7 +166,7 @@ const EditBlogPost = () => {
               dangerouslySetInnerHTML={{ __html: postPreview }}
             />
           </div>
-        </>
+        </div>
       )}
     </div>
   );

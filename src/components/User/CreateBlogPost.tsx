@@ -66,9 +66,9 @@ const CreateBlogPost = () => {
   }, [title, editorState]);
 
   return (
-    <div className={Style.CreateBlogPost}>
+    <div className={Style.CreateBlogPostContainer}>
       {postCreated === false ? (
-        <>
+        <div className={Style.CreateBlogPost}>
           <div>
             <h1>Write a blog post about it</h1>
             <h2>
@@ -104,9 +104,9 @@ const CreateBlogPost = () => {
             </button>
             {error !== '' && <span>{error}</span>}
           </div>
-        </>
+        </div>
       ) : (
-        <>
+        <div className={Style.CreateBlogPost}>
           <div className={Style.BlogPostMain}>
             <h1>Preview:</h1>
             <h2>{title}</h2>
@@ -117,7 +117,7 @@ const CreateBlogPost = () => {
               dangerouslySetInnerHTML={{ __html: postPreview }}
             />
           </div>
-        </>
+        </div>
       )}
     </div>
   );
